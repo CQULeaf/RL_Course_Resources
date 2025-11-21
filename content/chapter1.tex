@@ -1,0 +1,49 @@
+% 第一章：正文内容示例
+\section{Basic Concepts}
+
+\subsection{Basic concepts in reinforcement learning}
+
+\begin{enumerate}
+    \item \term{State:}The status of the agent with respect to the environment.
+    \item \term{State space:}The set of all states $\mathcal{S}=\left\{s_i\right\}_{i=1}^n$.
+    \item \term{Action:}For each state, there are several possible actions: $a_1, \ldots, a_n$.
+    \item \term{Action space of a state:}The set of all possible actions of a state $\mathcal{A}\left(s_i\right)=\left\{a_i\right\}_{i=1}^n$.
+    \item \term{State transition:}When taking an action, the agent may move from one state to another.
+    \item \term{State transition probability:}Use (conditional) probability to describe state transition!
+    \item \term{Policy:}It tells the agent what actions to take at a state.
+    \item \term{Reward:}A real number we get after taking an action. (Usually, positive reward represents encouragement and negative reward represents punishment)
+    \item \term{Trajectory:}A state-action-reward chain.
+    \item \term{Return:}The return of one trajectory is the sum of all the rewards collected along the trajectory.
+    \item \term{Discounted rate:}$\gamma \in[0,1)$, its roles are making the sum become finite and balancing the far and near future rewards: $\gamma\rightarrow 0$ represents the near future and $\gamma\rightarrow 1$ represents the far future.
+    \item \term{Episode:}When interacting with the environment following a policy, the agent may stop at some \textit{terminal states}. The resulting trajectory is called an episode (or a trial). An episode is usually assumed to be a finite trajectory. Tasks with episodes are called \textit{episode tasks}.
+\end{enumerate}
+
+\newpage
+
+\subsection{Markov decision process (MDP)}
+
+\begin{enumerate}
+    \item \term{Sets:} 
+        \begin{itemize}
+            \item \term{State:}The set of state $\mathcal{S}$
+            \item \term{Action:}The set of actions $\mathcal{A}(s)$ is associated for state $s \in \mathcal{S}$.
+            \item \term{Reward:}The set of rewards $\mathcal{R}(s, a)$.
+        \end{itemize}
+    \item \term{Probability distribution:}
+        \begin{itemize}
+            \item \term{State transition probability:}At state $s$, taking action $a$, the probability to transit to state $s^{\prime}$ is $p(s^{\prime} \mid s, a)$.
+            \item \term{Reward probability:}At state $s$, taking action $a$, the probability to get reward $r$ is $p(r \mid s, a)$.
+        \end{itemize}
+    \item \term{Policy:}At state $s$, the probability to choose action $a$ is $\pi(a \mid s)$.
+    \item \term{Markov property:} memoryless property 
+        \begin{equation}
+            \begin{aligned}
+            p\left(s_{t+1} \mid a_{t+1}, s_t, \ldots, a_1, s_0\right) &= p\left(s_{t+1} \mid a_{t+1}, s_t\right), \\
+            p\left(r_{t+1} \mid a_{t+1}, s_t, \ldots, a_1, s_0\right) &= p\left(r_{t+1} \mid a_{t+1}, s_t\right).
+            \end{aligned}
+        \end{equation}
+\end{enumerate}
+
+Markov decision process becomes Markov process once the policy is given!
+
+\newpage

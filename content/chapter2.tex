@@ -1,0 +1,232 @@
+\section{Bellman Equation}
+
+\subsection{Motivating examples}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.35\textwidth]{assets/figures/bellman-equation-example.png}
+\caption{The example to introduce bellman equation}
+\end{figure}
+
+\textit{How to calculate return?}
+
+\textbf{Method 1: by definition}
+
+Let $v_i$ denote the return obtained starting from $s_i$ ($i \equal{1,2,3,4} $)
+
+\begin{equation}
+    \begin{aligned}
+    & v_1=r_1+\gamma r_2+\gamma^2 r_3+\ldots \\
+    & v_2=r_2+\gamma r_3+\gamma^2 r_4+\ldots \\
+    & v_3=r_3+\gamma r_4+\gamma^2 r_1+\ldots \\
+    & v_4=r_4+\gamma r_1+\gamma^2 r_2+\ldots
+    \end{aligned}  
+\end{equation}
+
+\textbf{Method 2: bootstrapping}
+
+\begin{equation}
+    \begin{aligned}
+    & v_1=r_1+\gamma\left(r_2+\gamma r_3+\ldots\right)=r_1+\gamma v_2 \\
+    & v_2=r_2+\gamma\left(r_3+\gamma r_4+\ldots\right)=r_2+\gamma v_3 \\
+    & v_3=r_3+\gamma\left(r_4+\gamma r_1+\ldots\right)=r_3+\gamma v_4 \\
+    & v_4=r_4+\gamma\left(r_1+\gamma r_2+\ldots\right)=r_4+\gamma v_1
+    \end{aligned}
+\end{equation}
+
+\textit{How to solve the above equations?}
+
+Write in the following matrix-vector form:
+
+\begin{equation}
+    \underbrace{\left[\begin{array}{c}
+        v_1 \\
+        v_2 \\
+        v_3 \\
+        v_4
+    \end{array}\right]}_{\mathbf{v}}=\left[\begin{array}{c}
+        r_1 \\
+        r_2 \\
+        r_3 \\
+        r_4
+    \end{array}\right]+\left[\begin{array}{c}
+        \gamma v_2 \\
+        \gamma v_3 \\
+        \gamma v_4 \\
+        \gamma v_1
+    \end{array}\right]=\underbrace{\left[\begin{array}{c}
+        r_1 \\
+        r_2 \\
+        r_3 \\
+        r_4
+    \end{array}\right]}_{\mathbf{r}}+\gamma \underbrace{\left[\begin{array}{cccc}
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 1 \\
+        1 & 0 & 0 & 0
+    \end{array}\right]}_{\mathbf{P}} \underbrace{\left[\begin{array}{c}
+        v_1 \\
+        v_2 \\
+        v_3 \\
+        v_4
+    \end{array}\right]}_{\mathbf{v}}
+\end{equation}
+
+which can be rewritten as 
+
+\begin{equation}
+    \mathbf{v}=\mathbf{r}+\gamma \mathbf{P} \mathbf{v}
+\end{equation}
+
+This is \textbf{Bellman equation} (for this specific deterministic problem)
+
+\begin{enumerate}
+    \item Though simple, it demonstrates the core idea: the value of one state relies on the values of other states.
+    \item A matrix-vector form is more clear to see how to solve the state values.
+\end{enumerate}
+
+\subsection{State value}
+
+Consider the following single-step process:
+\begin{equation}
+    S_t \xrightarrow{A_t} R_{t+1}, S_{t+1}
+\end{equation}
+
+\begin{enumerate}
+    \item \term{$t, t+1$:} discrete time instances
+    \item \term{$S_t$:} \textbf{state} at time $t$
+    \item \term{$A_t$:} the \textbf{action} taken at state $S_t$
+    \item \term{$R_{t+1}$:} the \textbf{reward} obtained after taking $A_t$
+    \item \term{$S_{t+1}$:} the \textbf{state transited} to after taking $A_t$
+\end{enumerate}
+
+Note that $S_t, A_t, R_{t+1}$ are all \textit{random variables}.
+
+This step is governed by the following probability distributions:
+
+\begin{enumerate}
+    \item $S_t \to A_t$ is governed by $\pi(A_t = a \mid S_t = s)$
+    \item $S_t, A_t \to R_{t+1}$ is governed by $p(R_{t+1} = r \mid S_t = s, A_t = a)$
+    \item $S_t, A_t \to S_{t+1}$ is governed by $p(S_{t+1} = s' \mid S_t = s, A_t = a)$
+\end{enumerate}
+ 
+At this moment, we assume we know the model (i.e., the probability distributions)!
+
+Consider the following multi-step trajectory:
+
+\begin{equation}
+    S_t \xrightarrow{A_t} R_{t+1}, S_{t+1} \xrightarrow{A_{t+1}} R_{t+2}, S_{t+2} \xrightarrow{A_{t+2}} R_{t+3}, \ldots
+\end{equation}
+
+The discounted return is 
+
+\begin{equation}
+    G_t=R_{t+1}+\gamma R_{t+2}+\gamma^2 R_{t+3}+\ldots
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $\gamma \in[0,1)$ is a discounted rate.
+    \item $G_t$ is also a random variable since $R_{t+1}, R_{t+2}, \ldots$ are random variables.
+\end{itemize}
+
+The expectation (or called expected value or mean) of $G_t$ is defined as the \emph{state-value function} or simply \emph{state value}:
+
+\begin{equation}
+    v_\pi(s) = \mathbb{E}[G_t \mid S_t = s]
+\end{equation}
+
+\textbf{Remarks:}
+\begin{enumerate}
+    \item It is a function of $s$. It is a conditional expectation with the condition that the state starts from $s$.
+    \item It is based on the policy $\pi$. For a different policy, the state value may be different.
+    \item It represents the ``value'' of a state. If the state value is greater, then the policy is better because greater cumulative rewards can be obtained.
+\end{enumerate}
+
+\textbf{Q:} What is the relationship between \textbf{return} and \textbf{state value}?
+
+\textbf{A:} The state value is the mean of all possible returns that can be obtained starting from a state. If everything — $\pi(a \mid s)$, $p(r \mid s, a)$, $p(s' \mid s, a)$ — is deterministic, then state value is the same as return.
+
+\newpage
+
+\subsection{Bellman equation: Derivation}
+
+Consider a random trajectory:
+
+\begin{equation}
+    S_t \xrightarrow{A_t} R_{t+1}, S_{t+1} \xrightarrow{A_{t+1}} R_{t+2}, S_{t+2} \xrightarrow{A_{t+2}} R_{t+3}, \ldots
+\end{equation}
+
+The return $G_t$ can be written as 
+
+\begin{equation}
+    \begin{aligned}
+    G_t & =R_{t+1}+\gamma R_{t+2}+\gamma^2 R_{t+3}+\ldots, \\
+    & =R_{t+1}+\gamma\left(R_{t+2}+\gamma R_{t+3}+\ldots\right), \\
+    & =R_{t+1}+\gamma G_{t+1},
+    \end{aligned}
+\end{equation}
+
+Then, it follows from the definition of the state value that
+
+\begin{equation}
+    \begin{aligned}
+    v_\pi(s) & =\mathbb{E}\left[G_t \mid S_t=s\right] \\
+    & =\mathbb{E}\left[R_{t+1}+\gamma G_{t+1} \mid S_t=s\right] \\
+    & =\mathbb{E}\left[R_{t+1} \mid S_t=s\right]+\gamma \mathbb{E}\left[G_{t+1} \mid S_t=s\right]
+    \end{aligned}
+\end{equation}
+
+Next, calculate the two terms, respectively.
+
+First, calculate the first term $\mathbb{E}\left[R_{t+1} \mid S_t=s\right]$:
+
+\begin{equation}
+    \begin{aligned}
+    \mathbb{E}\left[R_{t+1} \mid S_t=s\right] & =\sum_a \pi(a \mid s) \mathbb{E}\left[R_{t+1} \mid S_t=s, A_t=a\right] \\
+    & =\sum_a \pi(a \mid s) \sum_r p(r \mid s, a) r
+    \end{aligned}
+\end{equation}
+
+\textbf{Note:} This is the mean of \textit{immediate rewards}
+
+Second, calculate the second term $\mathbb{E}\left[G_{t+1} \mid S_t=s\right]$
+
+\begin{equation}
+    \begin{aligned}
+    \mathbb{E}\left[G_{t+1} \mid S_t=s\right] & =\sum_{s^{\prime}} \mathbb{E}\left[G_{t+1} \mid S_t=s, S_{t+1}=s^{\prime}\right] p\left(s^{\prime} \mid s\right) \\
+    & =\sum_{s^{\prime}} \mathbb{E}\left[G_{t+1} \mid S_{t+1}=s^{\prime}\right] p\left(s^{\prime} \mid s\right) \\
+    & =\sum_{s^{\prime}} v_\pi\left(s^{\prime}\right) p\left(s^{\prime} \mid s\right) \\
+    & =\sum_{s^{\prime}} v_\pi\left(s^{\prime}\right) \sum_a p\left(s^{\prime} \mid s, a\right) \pi(a \mid s)
+    \end{aligned}
+\end{equation}
+
+\textbf{Note:} This is the mean of \textit{future rewards}
+
+\begin{theorem}{Bellman equation}{Bellman equation}
+Therefore, we have:
+
+\begin{equation}
+    \begin{aligned}
+    v_\pi(s) & =\mathbb{E}\left[R_{t+1} \mid S_t=s\right]+\gamma \mathbb{E}\left[G_{t+1} \mid S_t=s\right], \\
+    & =\underbrace{\sum_a \pi(a \mid s) \sum_r p(r \mid s, a) r}_{\text {mean of immediate rewards }}+\underbrace{\gamma \sum_a \pi(a \mid s) \sum_{s^{\prime}} p\left(s^{\prime} \mid s, a\right) v_\pi\left(s^{\prime}\right)}_{\text {mean of future rewards }}, \\
+    & =\sum_a \pi(a \mid s)\left[\sum_r p(r \mid s, a) r+\gamma \sum_{s^{\prime}} p\left(s^{\prime} \mid s, a\right) v_\pi\left(s^{\prime}\right)\right], \quad \forall s \in \mathcal{S} .
+    \end{aligned}
+\end{equation}
+\end{theorem}
+
+\textbf{Highlights:}
+
+\begin{enumerate}
+    \item The above equation is called \textbf{the Bellman equation}, which characterizes the relationship among the state-value functions of different states.
+    \item It consists of two terms: the immediate reward term and the future reward term.
+    \item A set of equations: every state has an equation like this.(important!!!)
+    \item $v_\pi(s)$ and $v_\pi\left(s^{\prime}\right)$ are state values to be calculated. Using \textbf{bootstrapping} to solve it!
+    \item $\pi(a \mid s)$ is a given policy. Solving the equation is called policy evaluation.
+    \item $p(r \mid s, a)$ and $p\left(s^{\prime} \mid s, a\right)$ represent the dynamic model.
+\end{enumerate}
+
+\subsection{Bellman equation: Matrix-vector form}
+
+
+\newpage
