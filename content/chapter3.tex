@@ -1,9 +1,264 @@
-\section{插图示例}
+\section{Bellman Optimality Equation}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.8\textwidth]{assets/figures/cqu.png}
-\caption{示例图片}
-\end{figure}
+\subsection{Definition of optimal policy}
 
+The state value could be used to evaluate if a policy is good or not if $v_{\pi_1}(s) \geq v_{\pi_2}(s)$ for all $s \in \mathcal{S}$ then $\pi_1$ is "better" than $\pi_2$.
+
+\begin{definition}{Optimal policy}{Optimal policy}
+    A policy $\pi^*$ is optimal if $v_{\pi^*}(s) \geq v_\pi(s)$ for all $s$ and for any other policy $\pi$.
+\end{definition}
+
+This definition leads to many questions:
+
+\begin{enumerate}
+    \item Does the optimal policy exist?
+    \item Is the optimal policy unique?
+    \item Is the optimal policy stochastic or deterministic?
+    \item How to obtain the optimal policy?
+\end{enumerate}
+
+To answer these questions, we should study the \textit{Bellman optimality equation}.
+
+\subsection{Introduce and solve the BOE}
+
+\begin{theorem}{Bellman Optimality Equation (BOE)}{BOE}
+    \textbf{BOE(elementwise form):}
+    \begin{equation}
+        \begin{aligned}
+        v(s) & =\max _\pi \sum_a \pi(a \mid s)\left(\sum_r p(r \mid s, a) r+\gamma \sum_{s^{\prime}} p\left(s^{\prime} \mid s, a\right) v\left(s^{\prime}\right)\right), \quad \forall s \in \mathcal{S} \\
+        & =\max _\pi \sum_a \pi(a \mid s) q(s, a) \quad s \in \mathcal{S}
+        \end{aligned}
+        \label{BOE elementwise form}
+    \end{equation}
+
+    \textbf{Remarks:}
+
+    \begin{enumerate}
+        \item $p(r \mid s, a), p\left(s^{\prime} \mid s, a\right)$ are known.
+        \item $v(s), v\left(s^{\prime}\right)$ are unknown and to be calculated.
+        \item Is $\pi(s)$ known or unknown?
+    \end{enumerate}
+
+    \textbf{BOE(matrix-vector form):}
+    \begin{equation}
+        v=\max _\pi\left(r_\pi+\gamma P_\pi v\right)
+        \label{BOE matrix-vector form}
+    \end{equation}
+    
+    where the elements corresponding to $s$ or $s^{\prime}$ are
+
+    \begin{equation}
+        \begin{aligned}
+        & {\left[r_\pi\right]_s \triangleq \sum_a \pi(a \mid s) \sum_r p(r \mid s, a) r} \\
+        & {\left[P_\pi\right]_{s, s^{\prime}}=p\left(s^{\prime} \mid s\right) \triangleq \sum_a \pi(a \mid s) \sum_{s^{\prime}} p\left(s^{\prime} \mid s, a\right)}
+        \end{aligned}
+    \end{equation}
+
+    Here $\max _\pi$ is performed elementwise.
+\end{theorem}
+
+\textbf{BOE is tricky yet elegant!}
+
+\begin{enumerate}
+    \item \textit{Why elegant?} It describes the optimal policy and optimal state value in an elegant way.
+    \item \textit{Why tricky?} There is a maximization on the right-hand side, which may not be straightforward to see how to compute.
+\end{enumerate}
+
+There are also many questions to answer for this theorem
+
+\begin{enumerate}
+    \item Algorithm: how to solve this equation?
+    \item existence: does this equation have solutions?
+    \item Uniqueness: is the solution to this equation unique?
+    \item Optimality: how is it related to optimal policy?
+\end{enumerate}
+
+For \cref{thm:BOE}, there are two unknowns from one equation. This seems hard to solve.
+
+\begin{example}{How to solve two unknowns from one equation}{solve 2 unkowns from 1 equation problem}
+    Consider two variables $x, a \in \mathbb{R}$. Suppose they satisfy
+    \begin{equation}
+        x=\max _a\left(2 x-1-a^2\right)
+    \end{equation}
+
+    This equation has two unknowns. To solve them, first consider the right hand side. Regardless the value of $x$, $\max _a\left(2 x-1-a^2\right)=2 x-1$ where the maximization is
+    achieved when $a=0$. Second, when $a=0$, the equation becomes $x=2 x-1$, which leads to $x=1$. Therefore, $a=0$ and $x=1$ are the solution of the equation.
+\end{example}
+
+We can use the approach from \cref{ex:solve 2 unkowns from 1 equation problem} to solve the BOE problem.
+
+Fix $v^{\prime}(s)$ first and solve $\pi$:
+
+\begin{equation}
+    \begin{aligned}
+    v(s) & =\max _\pi \sum_a \pi(a \mid s)\left(\sum_r p(r \mid s, a) r+\gamma \sum_{s^{\prime}} p\left(s^{\prime} \mid s, a\right) v\left(s^{\prime}\right)\right), \quad \forall s \in \mathcal{S} \\
+    & =\max _\pi \sum_a \pi(a \mid s) q(s, a)
+    \end{aligned}
+\end{equation}
+
+\begin{example}{How to solve $\max _\pi \sum_a \pi(a \mid s) q(s, a)$}{solve maximization problem}
+    Suppose $q_1, q_2, q_3 \in \mathbb{R}$ are given. Find $c_1^*, c_2^*, c_3^*$ solving 
+    \begin{equation}
+        \max _{c_1, c_2, c_3} c_1 q_1+c_2 q_2+c_3 q_3
+    \end{equation}
+
+    where $c_1+c_2+c_3=1$ and $c_1, c_2, c_3 \geq 0$. \\
+    Without loss of generality, suppose $q_3 \geq q_1, q_2$. Then, the optimal solution is $c_3^*=1$ and $c_1^*=c_2^*=0$. That is because for any $c_1, c_2, c_3$\\
+    $q_3=\left(c_1+c_2+c_3\right) q_3=c_1 q_3+c_2 q_3+c_3 q_3 \geq c_1 q_1+c_2 q_2+c_3 q_3$
+\end{example}
+
+Inspired by the above \cref{ex:solve maximization problem}, consider that $\sum_a \pi(a \mid s)=1$, we have
+
+\begin{equation}
+    \max _\pi \sum_a \pi(a \mid s) q(s, a)=\max _{a \in \mathcal{A}(s)} q(s, a)
+\end{equation}
+
+where the optimality is achieved when
+\begin{equation}
+    \pi(a \mid s)= \begin{cases}1 & a=a^* \\ 0 & a \neq a^*\end{cases}
+\end{equation}
+
+where $a^*=\arg \max _a q(s, a)$
+
+The BOE is $v=\max _\pi\left(r_\pi+\gamma P_\pi v\right)$. Let
+
+\begin{equation}
+    f(v):=\max _\pi\left(r_\pi+\gamma P_\pi v\right)
+\end{equation}
+
+Then, the BOE becomes
+
+\begin{equation}
+    v=f(v)
+\end{equation}
+
+where
+
+\begin{equation}
+    [f(v)]_s=\max _\pi \sum_a \pi(a \mid s) q(s, a), \quad s \in \mathcal{S}
+\end{equation}
+
+\begin{theorem}{Contraction mapping theorem}{Contraction mapping theorem}
+    \term{Fixed point:} $x \in X$ is a fixed point of $f: X \rightarrow X$ if $f(x)=x$\\
+    \term{Contraction mapping(or contractive function):} $f$ is a contraction mapping if 
+    \begin{equation}
+        \left\|f\left(x_1\right)-f\left(x_2\right)\right\| \leq \gamma\left\|x_1-x_2\right\|
+    \end{equation} where $\gamma \in(0,1)$
+    \begin{enumerate}
+        \item $\gamma$ must be strictly less than $1$ so that many limits such as $\gamma^k \rightarrow 0$ as $k \rightarrow 0$
+        \item Here $\|\cdot\|$ can be any vector norm.
+    \end{enumerate}
+\end{theorem}
+
+Here are some examples to demonstrate the concepts.
+
+\begin{example}{Fixed point and contraction mapping}{Fixed point and contraction mapping}
+    \textbf{For $x=f(x)=0.5 x, x \in \mathbb{R}$}\\
+    It is easy to verify that $x=0$ is a fixed point. Moreover, $f(x)=0.5 x$ is a contraction mapping because $\left\|0.5 x_1-0.5 x_2\right\|=0.5\left\|x_1-x_2\right\| \leq \gamma\left\|x_1-x_2\right\|$ for any $\gamma \in[0.5,1)$.
+    \textbf{For $x=f(x)=A x$, where $x \in \mathbb{R}^n$, $A \in \mathbb{R}^{n \times n}$ and $\|A\| \leq \gamma<1$}\\
+    It is easy to verify that $x=0$ is a fixed point. To see the contraction property, $\left\|A x_1-A x_2\right\|=\left\|A\left(x_1-x_2\right)\right\| \leq\|A\|\left\|x_1-x_2\right\| \leq \gamma\left\|x_1-x_2\right\|$. Therefore, $f(x)=A x$ is a contraction mapping.
+\end{example}
+
+\begin{theorem}{Contraction mapping theorem}{Contraction mapping theorem}
+    For any equation that has the form of $x=f(x)$, if $f$ is a contraction mapping, then
+    \begin{enumerate}
+        \item \term{Existence:} there exists a fixed point $x^*$ satisfying $f\left(x^*\right)=x^*$.
+        \item \term{Uniqueness:} the fixed point $x^*$ is unique.
+        \item \term{Algorithm:} consider a sequence $\left\{x_k\right\}$ where $x_{k+1}=f\left(x_k\right)$, then $x_k \rightarrow x^*$ as $k \rightarrow \infty$. Moreover, the convergence rate is exponentially fast.
+    \end{enumerate}
+\end{theorem}
+
+Let's come back to the Bellman optimality equation:
+
+\begin{equation}
+    v=f(v)=\max _\pi\left(r_\pi+\gamma P_\pi v\right)
+    \label{BOE}
+\end{equation}
+
+\begin{lemma}{Contraction property}{Contraction property}
+    $f(v)$ is a contraction mapping satisfying
+    \begin{equation}
+        \left\|f\left(v_1\right)-f\left(v_2\right)\right\| \leq \gamma\left\|v_1-v_2\right\|
+    \end{equation}
+    where $\gamma$ is the discount rate!
+\end{lemma}
+
+Apply the \cref{thm:Contraction mapping theorem} gives the following results.
+
+\begin{theorem}{Existence, uniqueness and algorithm}{Existence, uniqueness and algorithm}
+    For the BOE ~\eqref{BOE}, there always \textbf{exists} a solution $v^*$ and the solution is \textbf{unique}. The solution could be solved iteratively by
+    \begin{equation}
+        v_{k+1}=f\left(v_k\right)=\max _\pi\left(r_\pi+\gamma P_\pi v_k\right)
+    \end{equation}
+    This sequence $\left\{v_k\right\}$ converges to $v^*$ \textbf{exponentially fast} given any initial guess $v_0$. The convergence rate is determined by $\gamma$.
+\end{theorem}
+
+Suppose $v^*$ is the solution to the BOE ~\eqref{BOE}. It satisfies
+\begin{equation}
+    v^*=\max _\pi\left(r_\pi+\gamma P_\pi v^*\right)
+\end{equation}
+
+Suppose 
+\begin{equation}
+    \pi^*=\arg \max _\pi\left(r_\pi+\gamma P_\pi v^*\right)
+\end{equation}
+
+Then
+\begin{equation}
+    v^*=r_{\pi^*}+\gamma P_{\pi^*} v^*
+\end{equation}
+
+Therefore, $\pi^*$ is a policy and $v^*=v_{\pi^*}$ is the corresponding state value.
+
+\begin{theorem}{Policy optimality}{Policy optimality}
+    Suppose that  $v^*$ is the unique solution to $v=\max _\pi\left(r_\pi+\gamma P_\pi v\right)$, and $v_\pi$ is the state value function satisfying
+    $v_\pi=r_\pi+\gamma P_\pi v_\pi$ for any given policy $\pi$, then
+    \begin{equation}
+        v^* \geq v_\pi, \quad \forall \pi
+    \end{equation}
+\end{theorem}
+
+Therefore the reason why we should study the BOE is that it describes the optimal state value and optimal policy.
+
+Then what does an optimal policy $\pi^*$ look like?
+
+\begin{theorem}{Greedy optimal policy}{Greedy optimal policy}
+    For any $s \in \mathcal{S}$, the deterministic greedy policy
+    \begin{equation}
+        \pi^*(a \mid s)= \begin{cases}1 & a=a^*(s) \\ 0 & a \neq a^*(s)\end{cases}
+    \end{equation}
+    is an optimal policy solving the BOE. Here,
+    \begin{equation}
+        a^*(s)=\arg \max _a q^*(a, s)
+    \end{equation}
+    where
+    \begin{equation}
+        q^*(s, a):=\sum_r p(r \mid s, a) r+\gamma \sum_{s^{\prime}} p\left(s^{\prime} \mid s, a\right) v^*\left(s^{\prime}\right)
+    \end{equation}
+\end{theorem}
+
+\subsection{Analyzing optimal policies}
+
+\textit{What factors determine the optimal policy?}
+
+Recall the BOE ~\eqref{BOE elementwise form}, we can find that there are three factors:
+\begin{enumerate}
+    \item Reward design: $r$
+    \item System model: $p\left(s^{\prime} \mid s, a\right), p(r \mid s, a)$
+    \item Discount rate: $\gamma$
+\end{enumerate}
+
+$v(s), v\left(s^{\prime}\right), \pi(a \mid s)$ are unknowns to be calculated and system model is hard to change.
+So what we can change is only the \textbf{reward design} and \textbf{discount rate}.
+
+\begin{theorem}{Optimal policy invariance}{Optimal policy invariance}
+    Consider a MDP with $v^* \in \mathbb{R}^{|\mathcal{S}|}$ as the optimal state value satisfying $v^*=\max _\pi\left(r_\pi+\gamma P_\pi v^*\right)$.
+    If every reward $r$ is changed by an affine transformation to $a r+b$, where $a, b \in \mathbb{R}$ and $a \neq 0$, then the corresponding optimal state value
+    $v^{\prime}$ is also an affine transformation of $v^*$
+    \begin{equation}
+        v^{\prime}=a v^*+\frac{b}{1-\gamma} \mathbf{1}
+    \end{equation}
+    where $\gamma \in(0,1)$ is the discount rate and $\mathbf{1}=[1, \ldots, 1]^T$.
+    Consequently, the optimal policies are invariance to the affine transformation of the reward signals.
+\end{theorem}
 \newpage

@@ -111,4 +111,26 @@
 }
 
 % ========== 自定义命令 ==========
-\newcommand{\term}[1]{\textbf{\textit{#1}}\ }
+\newcommand{\term}[1]{\textbf{\textit{#1}}}
+\renewcommand{\proofname}{Proof}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\contentsname}{Contents}
+
+% cleveref support for tcolorbox environments
+\crefname{tcb@cnt@theorem}{theorem}{theorems}
+\Crefname{tcb@cnt@theorem}{Theorem}{Theorems}
+
+\crefname{tcb@cnt@lemma}{lemma}{lemmas}
+\Crefname{tcb@cnt@lemma}{Lemma}{Lemmas}
+
+\crefname{tcb@cnt@proposition}{proposition}{propositions}
+\Crefname{tcb@cnt@proposition}{Proposition}{Propositions}
+
+\crefname{tcb@cnt@definition}{definition}{definitions}
+\Crefname{tcb@cnt@definition}{Definition}{Definitions}
+
+\crefname{tcb@cnt@assumption}{assumption}{assumptions}
+\Crefname{tcb@cnt@assumption}{Assumption}{Assumptions}
+
+\crefname{tcb@cnt@example}{example}{examples}
+\Crefname{tcb@cnt@example}{Example}{Examples}
